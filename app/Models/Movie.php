@@ -9,6 +9,10 @@ class Movie extends Model
 {
     use HasFactory;
 
+    public $fillable = [
+        'titulo'
+    ];
+
     public function tags()
     {
         return $this->morphToMany(Tag::class, 'taggable');

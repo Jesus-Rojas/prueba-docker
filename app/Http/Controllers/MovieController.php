@@ -3,23 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\{
-    Post,
+    Movie,
     Tag
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class PostController extends Controller
+class MovieController extends Controller
 {
     public function index()
     {
-        return response()->json(Post::with('tags')->get(['id','name']));
+        return response()->json(Movie::with('tags')->get(['id','titulo']));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
+            'titulo' => 'required|string',
             "tags"    => "required|array",
             "tags.*"  => "required|string",
         ]);
@@ -28,15 +28,15 @@ class PostController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $post = Post::with('tags')
-            ->where('name', strtolower($request['name']))
-            ->select('id','name')
+        $movie = Movie::with('tags')
+            ->where('titulo', strtolower($request['titulo']))
+            ->select('id','titulo')
             ->first();
 
-        if ($post) {
+        if ($movie) {
             return response()->json([
-                'message' => 'El post ya existe intenta con otro',
-                'post' => $post
+                'message' => 'El movie ya existe intenta con otro',
+                'movie' => $movie
             ]);
         }
 
@@ -53,8 +53,8 @@ class PostController extends Controller
                 return $value['id'];
             }, $results);
 
-            return $this->storePostTaggable([
-                'name' => $request['name'],
+            return $this->storeMovieTaggable([
+                'titulo' => $request['titulo'],
                 'tags' => $results
             ]);
         }
@@ -77,25 +77,25 @@ class PostController extends Controller
             }
         }
 
-        return $this->storePostTaggable([
-            'name' => $request['name'],
+        return $this->storeMovieTaggable([
+            'titulo' => $request['titulo'],
             'tags' => $idTags
         ]);
     }
 
-    public function storePostTaggable($postData)
+    public function storeMovieTaggable($movieData)
     {
-        $post = Post::create([
-            'name' => strtolower($postData['name'])
+        $movie = Movie::create([
+            'titulo' => strtolower($movieData['titulo'])
         ]);
-        foreach ($postData['tags'] as $value) {
-            $post->tags()->attach($value);
+        foreach ($movieData['tags'] as $value) {
+            $movie->tags()->attach($value);
         }
         return response()->json([
             'message' => 'Se creo registro con exito',
-            'post' => Post::where('id', $post->id)
+            'movie' => Movie::where('id', $movie->id)
                         ->with('tags')
-                        ->select('name','id')
+                        ->select('titulo','id')
                         ->first()
         ]);
     }
