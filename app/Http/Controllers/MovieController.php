@@ -13,13 +13,13 @@ class MovieController extends Controller
 {
     public function index()
     {
-        return response()->json(Movie::with('tags')->get(['id','titulo']));
+        return response()->json(Movie::with('tags')->get(['id','title']));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'titulo' => 'required|string',
+            'title' => 'required|string',
             "tags"    => "required|array",
             "tags.*"  => "required|string",
         ]);
@@ -29,8 +29,8 @@ class MovieController extends Controller
         }
 
         $movie = Movie::with('tags')
-            ->where('titulo', strtolower($request['titulo']))
-            ->select('id','titulo')
+            ->where('title', strtolower($request['title']))
+            ->select('id','title')
             ->first();
 
         if ($movie) {
@@ -54,7 +54,7 @@ class MovieController extends Controller
             }, $results);
 
             return $this->storeMovieTaggable([
-                'titulo' => $request['titulo'],
+                'title' => $request['title'],
                 'tags' => $results
             ]);
         }
@@ -78,7 +78,7 @@ class MovieController extends Controller
         }
 
         return $this->storeMovieTaggable([
-            'titulo' => $request['titulo'],
+            'title' => $request['title'],
             'tags' => $idTags
         ]);
     }
@@ -86,7 +86,7 @@ class MovieController extends Controller
     public function storeMovieTaggable($movieData)
     {
         $movie = Movie::create([
-            'titulo' => strtolower($movieData['titulo'])
+            'title' => strtolower($movieData['title'])
         ]);
         foreach ($movieData['tags'] as $value) {
             $movie->tags()->attach($value);
@@ -95,7 +95,7 @@ class MovieController extends Controller
             'message' => 'Se creo registro con exito',
             'movie' => Movie::where('id', $movie->id)
                         ->with('tags')
-                        ->select('titulo','id')
+                        ->select('title','id')
                         ->first()
         ]);
     }

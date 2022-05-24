@@ -10,7 +10,7 @@ class Movie extends Model
     use HasFactory;
 
     public $fillable = [
-        'titulo'
+        'title'
     ];
 
     public function tags()
